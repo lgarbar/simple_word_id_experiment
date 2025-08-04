@@ -1,0 +1,14 @@
+# Requirements for PsychoPy Text Presentation Experiment
+# 
+# NOTE: Conda is recommended for all platforms to avoid build issues:
+# conda create -n psychopy-experiment python=3.9
+# conda activate psychopy-experiment
+# conda install -c conda-forge psychopy
+# pip install pandas matplotlib pyglet<2.0
+#
+# Alternative pip installation (may have build issues):
+
+psychopy>=2023.1.0
+pandas>=2.0.0
+matplotlib>=3.5.0
+pyglet<2.0
