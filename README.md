@@ -1,180 +1,130 @@
-# PsychoPy Text Presentation Experiment
+# PsychoPy Text Presentation Experiment with Real-Time Speech Detection
 
-This project implements a simple text presentation experiment using PsychoPy. The experiment presents multiple pages of text that can be progressed by pressing the spacebar.
+This project implements a real-time interactive text presentation experiment using **PsychoPy**. The experiment displays a sequence of text pages and advances either when the participant says the final word of the displayed content **or** presses the spacebar.
 
 ## Features
 
-- **Text Presentation**: Displays multiple pages of text content
-- **Spacebar Navigation**: Progress through pages by pressing the spacebar
-- **Data Recording**: Automatically records timing data for each page
-- **CSV Export**: Generates a CSV file with timing information for analysis
+- **Text Presentation**: Displays text pages in fullscreen mode
+- **Voice-Controlled Navigation**: Detects spoken words using Whisper and advances when the final word is spoken
+- **Keyboard Support**: Also allows progressing by pressing the spacebar
+- **Real-Time Transcription**: Leverages [`faster-whisper`](https://github.com/guillaumekln/faster-whisper) for accurate, real-time audio transcription
+- **Data Recording**: Automatically logs timing information for each screen
+- **CSV Export**: Saves collected data for later analysis
+
+---
 
 ## Installation
 
 ### Prerequisites
 
-- **Python 3.9** (recommended for best compatibility)
-- **Conda** (recommended for all platforms)
+- Python 3.9
+- Conda (recommended for easiest installation)
+- A microphone enabled on your system
 
-### Platform-Specific Installation
+### Option 1: Recommended Conda Installation
 
-#### All Platforms (Recommended)
-**Option 1: Automated Installation**
 ```bash
 ./install_conda.sh
 ```
 
-**Option 2: Manual Installation**
-1. Clone or download this repository
-2. Create a conda environment with Python 3.9:
-   ```bash
-   conda create -n psychopy-experiment python=3.9
-   conda activate psychopy-experiment
-   ```
-3. Install PsychoPy using conda-forge:
-   ```bash
-   conda install -c conda-forge psychopy
-   ```
-4. Install remaining dependencies:
-   ```bash
-   pip install pandas matplotlib pyglet<2.0
-   ```
+Or manually follow:
 
-#### Alternative: pip Installation
-**Option 1: Automated Installation**
+```bash
+conda create -n psychopy-experiment python=3.9
+conda activate psychopy-experiment
+conda install -c conda-forge psychopy
+pip install pandas matplotlib pyglet<2.0 faster-whisper sounddevice
+```
+
+### Option 2: pip Installation (Not Recommended on macOS ARM)
+
 ```bash
 ./install_pip.sh
 ```
 
-**Option 2: Manual Installation**
-1. Clone or download this repository
-2. Create a virtual environment:
-   ```bash
-   python -m venv psychopy-env
-   source psychopy-env/bin/activate  # On Windows: psychopy-env\Scripts\activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Usage
 
+## 1. Test installation
 
-
-## Usage
-
-1. **Test Installation** (recommended first step):
-   ```bash
-   python test_installation.py
-   ```
-
-2. **Run the Experiment**:
-   ```bash
-   python experiment.py
-   ```
-
-3. **Analyze Results** (after running the experiment):
-   ```bash
-   python analyze_data.py
-   ```
-
-## Experiment Structure
-
-The experiment consists of several text pages:
-1. **Welcome Page**: Introduction to the experiment
-2. **Instructions**: Detailed instructions for participants
-3. **Practice Page**: A practice trial
-4. **Main Task**: The main experimental task
-5. **Thank You**: Completion message
-
-## Data Collection
-
-The experiment automatically records:
-- **Page Name**: Identifier for each page (e.g., 'Instructions_1', 'Welcome_1')
-- **Start Time**: When each page was initiated (using `time.time()`)
-- **End Time**: When the participant progressed to the next page
-- **Duration**: How long each page was displayed
-
-Data is saved to `data/experiment_data.csv` in the data folder.
-
-## Data Analysis
-
-The `analyze_data.py` script provides comprehensive analysis of experiment results:
-
-- **Timing Statistics**: Average, standard deviation, and per-page timing
-- **Visualizations**: Bar charts and timeline plots of page durations
-- **Summary Reports**: Text summaries exported to `experiment_summary.txt`
-- **Data Export**: Easy-to-read CSV format for further analysis
-
-Run the analysis after completing the experiment:
 ```bash
-python analyze_data.py
+python test_installation.py
 ```
 
-## File Structure
+## 2. Run experiement
 
+```bash
+python experiment.py
 ```
+
+You’ll see pages like:
+
+- Welcome
+- Instructions
+- Word Lists (e.g., Banana\n\nRain\n\nArtichoke\n\nMother)
+- Thank You
+
+Speak the final word aloud to progress or press the spacebar.
+
+# Experiment Flow
+
+1. Welcome Page
+2. Instructions Page
+3. Practice or Task Page (displays a list of words)
+4. The screen progresses when:
+      - The last word on the screen is spoken aloud (automatically detected), OR
+      - The spacebar is pressed manually
+
+# Real-Time Transcription
+
+The transcription is handled by transcribe.py, using a background thread with a RealtimeTranscriber class.
+
+## Features of the Transcriber
+
+- Uses sounddevice for audio input
+- Runs Whisper in a background thread
+- Provides a queue of detected words with timestamps
+- Optional silence filtering (toggleable)
+
+⸻
+
+# Data Collection
+
+Saved to: data/experiment_data.csv
+
+Each row includes:
+
+- Page_Name
+- Start_Time
+- End_Time
+- Duration (in seconds)
+
+# File Structure
+
 audio_task/
-├── experiment.py              # Main experiment script
-├── config.py                  # Configuration settings
-├── test_installation.py       # Installation test script
-├── analyze_data.py           # Data analysis script
-├── requirements.txt           # Python dependencies (for non-macOS ARM)
-├── install_conda.sh          # Recommended conda installation script
-├── install_pip.sh           # Alternative pip installation script
-├── fix_pyglet.py            # Fix for pyglet compatibility issues
-├── README.md                 # This file
-├── data/                    # Data output folder
-│   ├── experiment_data.csv   # Generated data file (after running)
-│   ├── experiment_timing_analysis.png # Generated visualization
-│   └── experiment_summary.txt # Generated summary report
-```
+├── experiment.py             # Main experiment script
+├── transcribe.py             # Real-time transcription engine
+├── config.py                 # Configuration (text content, layout)
+├── analyze_data.py           # Analysis & plots
+├── test_installation.py      # Installation test
+├── requirements.txt          # pip dependencies
+├── install_conda.sh          # Conda installer
+├── install_pip.sh            # pip installer
+├── fix_pyglet.py             # Compatibility helper for pyglet
+├── data/
+│   ├── experiment_data.csv         # Raw timing results
+│   ├── experiment_summary.txt      # Generated summary
+│   └── experiment_timing_analysis.png  # Graphical report
+└── README.md               # This file
 
-## Customization
+# Requirements
 
-To modify the experiment content and settings, edit the `config.py` file:
+- Python 3.9
+- psychopy
+- faster-whisper
+- sounddevice
+- numpy, pandas, matplotlib
+- pyglet<2.0
 
-- **Experiment Content**: Modify the `EXPERIMENT_CONTENT` dictionary
-- **Window Settings**: Adjust `WINDOW_CONFIG` for display properties
-- **Text Settings**: Modify `TEXT_CONFIG` for text appearance
-- **Data Settings**: Change `DATA_CONFIG` for data collection options
+# License
 
-Example of modifying experiment content:
-```python
-EXPERIMENT_CONTENT = {
-    'Welcome_1': 'Your custom welcome message here',
-    'Instructions_1': 'Your custom instructions here',
-    # ... add more pages as needed
-}
-```
-
-## Requirements
-
-- **Python 3.9** (recommended for best compatibility)
-- **Conda** (recommended for all platforms)
-- **PsychoPy** (latest version via conda-forge)
-- **pandas** (for data analysis)
-- **matplotlib** (for visualizations)
-- **pyglet<2.0** (for compatibility)
-- **numpy** (automatically installed as dependency)
-
-## Notes
-
-- The experiment runs in fullscreen mode by default
-- Press 'Escape' to exit the experiment early
-- All timing data is automatically saved to CSV format
-- The experiment is designed to be easily extensible for more complex studies
-
-## Troubleshooting
-
-### Installation Issues
-If you encounter build errors on any platform:
-1. Use conda instead of pip: `conda install -c conda-forge psychopy`
-2. Ensure you're using Python 3.9: `conda create -n psychopy-experiment python=3.9`
-3. The conda-forge channel handles system dependencies (SDL2, FFmpeg, etc.) automatically
-
-### Common Issues
-- **HDF5 errors**: Use conda installation
-- **SDL2/FFmpeg errors**: Use conda installation
-- **PyObjC build errors**: Use conda installation
-- **Python version conflicts**: Use Python 3.9 for best compatibility
-- **Pyglet compatibility errors**: Run `python fix_pyglet.py` or install `pyglet<2.0` 
+MIT License
