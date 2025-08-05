@@ -58,18 +58,25 @@ class TextExperiment:
 
             new_words = self.transcriber.get_transcribed_words()
             for word, start, end in new_words:
+                end_time = time.time()
                 word_clean = word.translate(str.maketrans('', '', string.punctuation)).lower()
                 print(f"{word_clean} [{start:.2f}s - {end:.2f}s]")
 
                 if spoken_index < len(word_list):
                     target_word = word_list[spoken_index].lower()
                     if word_clean == target_word:
+                        self.timing_data.append({
+                            'Page_Name': word_clean,
+                            'Start_Time': end_time - end,
+                            'End_Time': end_time,
+                            'Duration': end
+                        })
                         text_stims[spoken_index].color = 'green'
                         spoken_index += 1
                         if spoken_index < len(word_list):
                             text_stims[spoken_index].color = 'red'
                         else:
-                            print(f"Detected final word '{final_word}', advancing...")
+                            print(f"Detected final word '{final_word}', next screen...")
                             continue_screen = True
                         break 
 
