@@ -18,36 +18,60 @@ class TextExperiment:
         self.transcriber = transcriber
 
     def present_text_page(self, page_name, word_list):
-        text_content = '\n\n'.join(word_list)
-        text_stim = TextStim(win=self.win, text=text_content, **TEXT_CONFIG)
-
         final_word = word_list[-1].lower()
+        spoken_index = 0  # Track the current word to be spoken
 
         start_time = time.time()
-        text_stim.draw()
-        self.win.flip()
 
-        clock = core.Clock()
+        # Create and position each word stimulus
+        text_stims = []
+        num_words = len(word_list)
+        vertical_spacing = 80
+        start_y = (num_words - 1) / 2 * vertical_spacing
+
+        for i, word in enumerate(word_list):
+            stim = TextStim(
+                win=self.win,
+                text=word,
+                pos=(0, start_y - i * vertical_spacing),
+                **TEXT_CONFIG
+            )
+            stim.color = 'white'
+            text_stims.append(stim)
+
+        if 'List' in page_name:
+            text_stims[spoken_index].color = 'red'
+
         continue_screen = False
 
         while not continue_screen:
+            for stim in text_stims:
+                stim.draw()
+            self.win.flip()
+
             keys = event.getKeys(keyList=KEYBOARD_CONFIG['allowed_keys'])
             if KEYBOARD_CONFIG['exit_key'] in keys:
                 return False
-
             if "space" in keys:
                 continue_screen = True
                 break
 
             new_words = self.transcriber.get_transcribed_words()
             for word, start, end in new_words:
-                self.current_word = word.split()
-                word = word.translate(str.maketrans('', '', string.punctuation))
-                print(f"{word} [{start:.2f}s - {end:.2f}s]")
-                if word.lower() == final_word:
-                    print(f"Detected final word '{final_word}', advancing...")
-                    continue_screen = True
-                    break
+                word_clean = word.translate(str.maketrans('', '', string.punctuation)).lower()
+                print(f"{word_clean} [{start:.2f}s - {end:.2f}s]")
+
+                if spoken_index < len(word_list):
+                    target_word = word_list[spoken_index].lower()
+                    if word_clean == target_word:
+                        text_stims[spoken_index].color = 'green'
+                        spoken_index += 1
+                        if spoken_index < len(word_list):
+                            text_stims[spoken_index].color = 'red'
+                        else:
+                            print(f"Detected final word '{final_word}', advancing...")
+                            continue_screen = True
+                        break 
 
             core.wait(0.1)
 
@@ -90,7 +114,7 @@ class TextExperiment:
             print("No data to save.")
 
 def main():
-    transcriber = transcribe.RealtimeTranscriber()
+    transcriber = transcribe.RealtimeTranscriber(block_duration=3)
     transcriber.toggle_silence_filter(True)
     transcriber.start()
 
