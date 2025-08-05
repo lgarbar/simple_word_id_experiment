@@ -17,9 +17,13 @@ TEXT_CONFIG = {
 
 EXPERIMENT_CONTENT = {
     'Welcome_1': ['Welcome to the Experiment!'],
-    'Instructions_1': ['Instructions:', 'You will see several pages of text', 'Repeat the words you see outloud.'],
+    'Instructions_1': ['Instructions:', 'In this task, you will see several pages of text,', 'and you will read the words outloud.'],
+    'Instructions_2': ['Instructions:', 'When a word is RED, slowly and clearly', 'read the word aloud.'],
+    'Instructions_3': ['Instructions:', 'I will demonstrate first.'],
+    'List_Demo_1': ['Condo', 'Makeup', 'Apple', 'Baker'],
+    'Instructions_4': ['Instructions:', 'Now please read the text on the following pages.'],
     'List_1': ['Banana', 'Hairdresser', 'Closet', 'Mother'],
-    'List_2': ['Cloud', 'Laugh', 'Penguin', 'Table'],
+    'List_2': ['Cloud', 'Soccer', 'Penguin', 'Table'],
     'List_3': ['Chair', 'Dance', 'Bottle', 'Sunshine'],
     'ThankYou_1': ['Thank You!', 'You have completed the experiment.', 'Your data has been saved.', 'Press SPACEBAR to exit.']
 }
